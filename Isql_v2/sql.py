@@ -3,11 +3,12 @@ import pickle as pickle
 
 def stringfy(value:any)->str:
     if type(value) == str:
-        value = value.replace("'", "\'")
-        value = value.replace('"', '\"')
+        value = value.replace("'", "\\'")
+        value = value.replace('"', '\\"')
         return f"'{value}'"
 
     elif type(value)==datetime:
+        value = value.strftime(format='%Y-%m-%d')
         return f"'{value}'"
 
     elif value == None:

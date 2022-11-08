@@ -22,10 +22,10 @@ class RawDatasetReader:
         with open(file_path, mode='rb') as fr:
             data = pickle.load(fr)
         key = self.get_key_from_fileName(fileName)
-        yield {key: data}
+        return {key: data}
 
     def get_rawDataset(self, file_list) -> List[Dict]:
-        return (self.open_file_and_get_rawData(file) for file in tqdm(file_list))
+        return (self.open_file_and_get_rawData(fileName) for fileName in tqdm(file_list))
 
 # dataset filter
 class IdatasetFilter(Protocol):
