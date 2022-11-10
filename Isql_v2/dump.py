@@ -19,8 +19,10 @@ class RawDatasetReader:
 
     def open_file_and_get_rawData(self, fileName:str)-> Dict:
         file_path = self.folder_path.joinpath(fileName)
+        print(f'!!!!!!!!!!!!!!!!! {file_path}')
         with open(file_path, mode='rb') as fr:
             data = pickle.load(fr)
+            print(f'!!!!!!!!!!!!!!!!! {data}')
         key = self.get_key_from_fileName(fileName)
         return {key: data}
 
@@ -30,7 +32,7 @@ class RawDatasetReader:
 # dataset filter
 class IdatasetFilter(Protocol):
 
-    def filtDataset():
+    def filt():
         ...
 
 
@@ -42,7 +44,7 @@ class CompositeDatasetFilter:
     def add(self, filtedDataset:IdatasetFilter):
         self.container.append(filtedDataset)
     
-    def filtDataset(self, rawDataset):
+    def filt(self, rawDataset):
         currentDataset = rawDataset
         for filter in self.filters:
             currentDataset = filter.filtDataset(currentDataset)
@@ -69,9 +71,9 @@ class DumpPipeline:
             cf = CompositeDatasetFilter()
             for filter in self.datasetFilter:
                 cf.add(filter)
-            filtedDataset = cf.filtDataset(rawDataset)
+            filtedDataset = cf.filt(rawDataset)
         else:
-            filtedDataset = self.datasetFilter.filtDataset(rawDataset)
+            filtedDataset = self.datasetFilter.filt(rawDataset)
         return filtedDataset
 
     def execute(self, commit:bool):

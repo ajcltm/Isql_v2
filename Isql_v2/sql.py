@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 import pickle as pickle
 
 def stringfy(value:any)->str:
@@ -7,9 +7,8 @@ def stringfy(value:any)->str:
         value = value.replace('"', '\\"')
         return f"'{value}'"
 
-    elif type(value)==datetime:
-        value = value.strftime(format='%Y-%m-%d')
-        return f"'{value}'"
+    elif type(value)==datetime or type(value)==date:
+        return f'"{value}"'
 
     elif value == None:
         return "Null"
@@ -27,6 +26,7 @@ class CreateSql:
         types = list(customType.values())
         type_part = ', '.join([f'{field} {type_}' for field, type_ in zip(self.fields, types)])
         sql = f'CREATE TABLE {self.table_name} ({type_part})'
+        print(f'create sql : \n {sql}')
         return sql
 
 
@@ -51,12 +51,12 @@ class InsertSql:
         values_part = self.get_values_part(data)
         fields_part = ', '.join(self.fields)
         sql = f'INSERT INTO {self.table_name} ({fields_part}) VALUES{values_part}'
-        print(sql)
+        print(f'insert sql : \n {sql}')
         return sql
 
     def get_dump(self, dataset):
         values_parts = self.get_values_parts(dataset)
         fields_part = ', '.join(self.fields)
         sql = f'INSERT INTO {self.table_name} ({fields_part}) VALUES{values_parts}'
-        print(sql)
+        print(f'dump sql : \n {sql[:200]}')
         return sql

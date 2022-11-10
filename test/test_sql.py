@@ -1,7 +1,7 @@
 from Isql_v2 import sql
 
 import unittest
-from datetime import datetime
+from datetime import datetime, date
 from pydantic import BaseModel
 
 class Test_stringfy(unittest.TestCase):
@@ -19,9 +19,13 @@ class Test_stringfy(unittest.TestCase):
 
     def test_datetime_to_sql_style(self):
 
-        test_date = datetime(1923, 8, 29)
-        processed = sql.stringfy(test_date)
-        self.assertEqual("'1923-08-29'", processed) # -> '1923-08-29'
+        test_date_1 = datetime(1923, 8, 29)
+        processed_1 = sql.stringfy(test_date_1)
+        self.assertEqual('"1923-08-29 00:00:00"', processed_1)
+
+        test_date_2 = date(1923, 8, 29)
+        processed_2 = sql.stringfy(test_date_2)
+        self.assertEqual('"1923-08-29"', processed_2)
         
     def test_none_value(self):
         test_value = None
