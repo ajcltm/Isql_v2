@@ -1,17 +1,25 @@
 from datetime import datetime, date
 import pickle as pickle
 
-def stringfy(value:any)->str:
+def stringfy(value:any, dbtype)->str:
     if type(value) == str:
-        value = value.replace("'", "\\'")
-        value = value.replace('"', '\\"')
-        return f"'{value}'"
+        if dbtype == 'mysql':
+            symbols = ['\\', "'", '"', "(", ")", "%", '&', '@', '*', '[', ']', '{', '}', '^', '!', '/', '-', '+', '?', ';', '~', '|']
+            for symbol in symbols:
+                value = value.replace(symbol, '\\'+f'{symbol}') 
+            return f"'{value}'"
+        else :
+            symbols = ['\\', '"', "(", ")", "%", '&', '@', '*', '[', ']', '{', '}', '^', '!', '/', '-', '+', '?', ';', '~', '|']
+            for symbol in symbols:
+                value = value.replace(symbol, '\\'+f'{symbol}') 
+            value = value.replace("'", "'"+f"'") 
+            return f"'{value}'"
 
     elif type(value)==datetime or type(value)==date:
-        return f'"{value}"'
+        return f"'{value}'"
 
     elif value == None:
-        return "Null"
+        return 'Null'
 
     else:
         return f'{value}'
@@ -36,27 +44,27 @@ class InsertSql:
         self.table_name = model.__name__
         self.fields = list(model.__fields__.keys())
 
-    def get_values_part(self, data):
+    def get_values_part(self, data, dbtype):
         values = data.dict().values()
-        values_part_lst = [stringfy(value) for value in values]
+        values_part_lst = [stringfy(value=value, dbtype=dbtype) for value in values]
         values_part = ', '.join(values_part_lst)
         return f'({values_part})'
 
-    def get_values_parts(self, dataset):
-        values_part_lst = [self.get_values_part(i) for i in dataset]
+    def get_values_parts(self, dataset, dbtype):
+        values_part_lst = [self.get_values_part(data=i, dbtype=dbtype) for i in dataset]
         values_part = ', '.join(values_part_lst)
         return values_part
 
-    def get_insert(self, data):
-        values_part = self.get_values_part(data)
+    def get_insert(self, data, dbtype='mysql'):
+        values_part = self.get_values_part(data=data, dbtype=dbtype)
         fields_part = ', '.join(self.fields)
         sql = f'INSERT INTO {self.table_name} ({fields_part}) VALUES{values_part}'
         print(f'insert sql : \n {sql}')
         return sql
 
-    def get_dump(self, dataset):
-        values_parts = self.get_values_parts(dataset)
+    def get_dump(self, dataset, dbtype='mysql'):
+        values_parts = self.get_values_parts(dataset=dataset, dbtype=dbtype)
         fields_part = ', '.join(self.fields)
         sql = f'INSERT INTO {self.table_name} ({fields_part}) VALUES{values_parts}'
-        print(f'dump sql : \n {sql[:200]}')
+        print(f'dump sql : \n {sql[:250]}')
         return sql

@@ -4,42 +4,82 @@ import unittest
 from datetime import datetime, date
 from pydantic import BaseModel
 
-class Test_stringfy(unittest.TestCase):
+class Test_stringfy_mysql(unittest.TestCase):
 
     def test_string_with_comma(self):
 
         test_string_1 = "'x'"
-        processed_1 = sql.stringfy(test_string_1)
+        processed_1 = sql.stringfy(test_string_1, 'mysql')
+        print(f' small_upper  {processed_1}')
         self.assertEqual("'\\'x\\''", processed_1)  # -> ''\x\''
 
         test_string_2 = '"y"'
-        processed_2 = sql.stringfy(test_string_2)
+        processed_2 = sql.stringfy(test_string_2, 'mysql')
         answer = '''\\"y\\"''' # -> "\y\"
         self.assertEqual(f"'{answer}'", processed_2) # -> '"\y\"'
 
     def test_datetime_to_sql_style(self):
 
         test_date_1 = datetime(1923, 8, 29)
-        processed_1 = sql.stringfy(test_date_1)
-        self.assertEqual('"1923-08-29 00:00:00"', processed_1)
+        processed_1 = sql.stringfy(test_date_1, 'mysql')
+        self.assertEqual("'1923-08-29 00:00:00'", processed_1)
 
         test_date_2 = date(1923, 8, 29)
-        processed_2 = sql.stringfy(test_date_2)
-        self.assertEqual('"1923-08-29"', processed_2)
+        processed_2 = sql.stringfy(test_date_2, 'mysql')
+        self.assertEqual("'1923-08-29'", processed_2)
         
     def test_none_value(self):
         test_value = None
-        processed = sql.stringfy(test_value)
-        self.assertEqual("Null", processed) # -> Null
+        processed = sql.stringfy(test_value, 'mysql')
+        self.assertEqual('Null', processed) # -> Null
 
     def test_number_value(self):
         test_value = 1234
-        processed = sql.stringfy(test_value)
+        processed = sql.stringfy(test_value, 'mysql')
         self.assertEqual('1234', processed) # -> 1234
 
     def test_usual_words(self):
         test_word = 'kim'
-        processed = sql.stringfy(test_word)
+        processed = sql.stringfy(test_word, 'mysql')
+        self.assertEqual("'kim'", processed) # -> 'kim'
+
+class Test_stringfy_sqlite(unittest.TestCase):
+
+    def test_string_with_comma(self):
+
+        test_string_1 = "'x'"
+        processed_1 = sql.stringfy(test_string_1, 'sqlite')
+        print(f' small_upper  {processed_1}')
+        self.assertEqual("'''x'''", processed_1)  # -> ''\x\''
+
+        test_string_2 = '"y"'
+        processed_2 = sql.stringfy(test_string_2, 'sqlite')
+        answer = '''\\"y\\"''' # -> "\y\"
+        self.assertEqual(f"'{answer}'", processed_2) # -> '"\y\"'
+
+    def test_datetime_to_sql_style(self):
+
+        test_date_1 = datetime(1923, 8, 29)
+        processed_1 = sql.stringfy(test_date_1, 'sqlite')
+        self.assertEqual("'1923-08-29 00:00:00'", processed_1)
+
+        test_date_2 = date(1923, 8, 29)
+        processed_2 = sql.stringfy(test_date_2, 'sqlite')
+        self.assertEqual("'1923-08-29'", processed_2)
+        
+    def test_none_value(self):
+        test_value = None
+        processed = sql.stringfy(test_value, 'sqlite')
+        self.assertEqual('Null', processed) # -> Null
+
+    def test_number_value(self):
+        test_value = 1234
+        processed = sql.stringfy(test_value, 'sqlite')
+        self.assertEqual('1234', processed) # -> 1234
+
+    def test_usual_words(self):
+        test_word = 'kim'
+        processed = sql.stringfy(test_word, 'sqlite')
         self.assertEqual("'kim'", processed) # -> 'kim'
 
 
