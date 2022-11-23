@@ -19,10 +19,8 @@ class RawDatasetReader:
 
     def open_file_and_get_rawData(self, fileName:str)-> Dict:
         file_path = self.folder_path.joinpath(fileName)
-        print(f'!!!!!!!!!!!!!!!!! {file_path}')
         with open(file_path, mode='rb') as fr:
             data = pickle.load(fr)
-            print(f'!!!!!!!!!!!!!!!!! {data}')
         key = self.get_key_from_fileName(fileName)
         return {key: data}
 
@@ -47,13 +45,13 @@ class CompositeDatasetFilter:
     def filt(self, rawDataset):
         currentDataset = rawDataset
         for filter in self.filters:
-            currentDataset = filter.filtDataset(currentDataset)
+            currentDataset = filter.filt(currentDataset)
         return currentDataset
 
 
 class Idumper(Protocol):
 
-    def dump_data():
+    def execute():
         ...
 
 
@@ -79,7 +77,7 @@ class DumpPipeline:
     def execute(self, commit:bool):
         rawDataset = self.rawDataset.get_rawDataset(self.file_list)
         filtedDataset = self.get_filtedDataset(rawDataset)
-        self.dumper.dump_data(filtedDataset, commit)
+        self.dumper.execute(filtedDataset, commit)
 
 
 
@@ -102,7 +100,7 @@ class DumpApp:
         if len(file_list) > 10000:
             self.chunked_file_list = self.chunk_list(file_list, 5000)
             for file_list in self.chunked_file_list:
-                i = DumpPipeline(self.r, self.p, self.d, file_list)
+                i = DumpPipeline(self.r, self.f, self.d, file_list)
                 i.execute(commit)
         else:
             i = DumpPipeline(rawDataset=self.r, datasetFilter=self.f, dumper=self.d, file_list=file_list)
